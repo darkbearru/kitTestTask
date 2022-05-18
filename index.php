@@ -11,7 +11,7 @@ use abramenko\template;
 $router = new Router ();
 $router->addPath ('default', "indexPage");
 $router->addPath ('/admin/', "administratorPage");
-$router->addPath ('/get/', "getPosts");
+$router->addPath ('/api/', "restAPI");
 $router->run ();
 
 exit;
@@ -28,7 +28,7 @@ function administratorPage ()
     echo "You selected Admin Section<br />";
 }
 
-function getPosts ()
+function restAPI ()
 {
     $db = new DB ();
     $results = $db->Query ('select id, upid, name, text from posts order by id');

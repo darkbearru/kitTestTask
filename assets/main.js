@@ -28,7 +28,7 @@ class myTree
 
         if (this.idTree.children.length !== 0) {
             this._tree = this.loadTreeFromHtml (this.idTree.children);
-            this.setupEvents ();
+            this.setupTreeEvents ();
         } else {
             this.loadTree ();
         }
@@ -41,18 +41,18 @@ class myTree
      */
     loadTreeFromHtml (list)
     {
-        let tree = [];
         for (let item of list) {
-            let itemData = this.getTreeItemData (item);
+            if (!item._data) {
+                let itemData = this.getTreeItemData (item);
+                item._data = {...itemData};
+            }
             let childs = item.querySelector ('ul');
             if (childs && childs.children.length) {
-                itemData.childs = this.loadTreeFromHtml (childs.children);
+                item._data.childs = this.loadTreeFromHtml (childs.children);
                 item.classList.add ('has-childs');
             } 
-            item._data = itemData;
-            tree.push (itemData);
         }
-        return tree;
+        return true;
     }
 
     /**
@@ -75,7 +75,7 @@ class myTree
     /**
      * Устанавливаем обработчики событий
      */
-    setupEvents ()
+    setupTreeEvents ()
     {
         let li = this.idTree.querySelectorAll ("li:not(.ready)");
         li.forEach (item => {
@@ -134,7 +134,7 @@ class myTree
      */
     loadTree ()
     {
-        fetch ('/get/')
+        fetch ('/api/')
             .then (response => response.json ())
             .then (data => this.loadTreeFinished (data));
     }
@@ -145,21 +145,36 @@ class myTree
      */
     loadTreeFinished (data)
     {
-        console.log (data);
-        
+        let buffer = this.createHTMLTree (data);
+        this.idTree.innerHTML = '';
+        this.idTree.appendChild(buffer);
+        this.setupTree ();
+    }
+
+    /**
+     * Проходим по переданным данным и создаём 
+     * на основе этого дерево в буффере 
+     * @param {Object} data 
+     */
+    createHTMLTree (data) {
         const frag = document.createDocumentFragment();
-        for(let item of data) {
+	    for (let i in data) {
+			if (!data.hasOwnProperty (i)) continue;
+
             let li = document.createElement ('li');
-            li._data = item;
+            let item = data[i];
+            //console.log (item);
+            //let [id, upid, name, text, itemChilds] = item;
+            li._data = {id: item.id, upid: item.upid, name: item.name, text: item.text, childs: (item.childs ? true : false)};
             li.innerHTML = `<span data-id="${item.id}"><i></i><a href="">${item.name}</a></span>`;
             if (item.childs) {
                 let ul = document.createElement ('ul');
-                ul.appendChild ($this.loadTreeFinished (item.childs));
+                ul.appendChild (this.createHTMLTree (item.childs));
                 li.appendChild (ul);
             }
+
             frag.appendChild (li);
         }
-        console.log (frag);
         return frag;
     }
 
