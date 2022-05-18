@@ -5,10 +5,12 @@ namespace abramenko;
 class Router 
 {
     private $_routerPaths;
+    private $_parent;
 
-    public function __construct () 
+    public function __construct ($parent) 
     {
         $this->_routerPaths = [];
+        $this->_parent = $parent;
     }
 
     public function addPath ($path, $action)
@@ -22,14 +24,18 @@ class Router
 
         if (!empty ($this->_routerPaths[$_url])) {
             $_action = $this->_routerPaths[$_url];
-            if (function_exists ($_action)) {
-                $_action ();
+            if (method_exists ($this->_parent, $_action)) {
+                $this->_parent->$_action ();
                 return true;
             }
         }
         // If nothing found, show default page
-        if (!empty ($this->_routerPaths["default"])) {
-            $this->_routerPaths["default"]();
+        $_action = $this->_routerPaths["default"];
+        if (!empty ($_action)) {
+            if (method_exists ($this->_parent, $_action)) {
+                $this->_parent->$_action ();
+                return true;
+            }
         }
     }
 }
