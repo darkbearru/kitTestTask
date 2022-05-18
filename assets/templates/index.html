@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base href="/">
     <title>Document</title>
     <link rel="stylesheet" href="/assets/main.css" type="text/css" />
+    <script type="module" src="./assets/main.js" async></script>
 </head>
 <body>
     <header>
@@ -13,68 +15,40 @@
     </header>
     <section>
         <aside>
-            <ul class="my-tree">
-                <li class="has-childs selected">
-                    <span><i></i><a href="">Record 0-1</a></span>
+            <ul class="my-tree" id="my-tree">
+                <li class="">
+                    <span data-id="1" data-upid="0" data-name="Record 0-1" data-text="More text">
+                        <i></i><a href="">Record 0-1</a>
+                    </span>
                 </li>
                 <li>
-                    <span><i></i><a href="">Record 0-2</a></span>
-                </li>
-                <li class="has-childs">
-                    <span><i></i><a href="">Record 0-3</a></span>
-                    <ul class="my-tree">
-                        <li class="has-childs">
-                            <span><i></i><a href="">Record 03-1</a></span>
-                        </li>
-                        <li>
-                            <span><i></i><a href="">Record 03-2</a></span>
-                        </li>
-                        <li class="has-childs">
-                            <span><i></i><a href="">Record 03-3</a></span>
-                        </li>
-                        <li>
-                            <span><i></i><a href="">Record 03-4</a></span>
-                        </li>
-                        <li class="has-childs">
-                            <span><i></i><a href="">Record 03-5</a></span>
-                        </li>
-                        <li class="has-childs">
-                            <span><i></i><a href="">Record 03-6</a></span>
-                        </li>
-                    </ul>
+                    <span data-id="2" data-upid="0" data-name="Record 0-2" data-text="More text">
+                        <i></i><a href="">Record 0-2</a>
+                    </span>
                 </li>
                 <li>
-                    <span><i></i><a href="">Record 0-4</a></span>
-                </li>
-                <li class="has-childs">
-                    <span><i></i><a href="">Record 0-5</a></span>
-                    <ul class="my-tree">
-                        <li class="has-childs">
-                            <span><i></i><a href="">Record 05-1</a></span>
+                    <span data-id="3" data-upid="0" data-name="Record 0-3" data-text="More text">
+                        <i></i><a href="">Record 0-3</a>
+                    </span>
+                    <ul>
+                        <li>
+                            <span data-id="4" data-upid="3" data-name="Record 03-1" data-text="More text">
+                                <i></i><a href="">Record 03-1</a>
+                            </span>
                         </li>
                         <li>
-                            <span><i></i><a href="">Record 05-2</a></span>
-                        </li>
-                        <li class="has-childs">
-                            <span><i></i><a href="">Record 05-3</a></span>
-                        </li>
-                        <li>
-                            <span><i></i><a href="">Record 05-4</a></span>
-                        </li>
-                        <li class="has-childs">
-                            <span><i></i><a href="">Record 05-5</a></span>
-                        </li>
-                        <li class="has-childs">
-                            <span><i></i><a href="">Record 05-6</a></span>
+                            <span data-id="5" data-upid="3" data-name="Record 03-2" data-text="More text">
+                                <i></i><a href="">Record 03-2</a>
+                            </span>
                         </li>
                     </ul>
-                </li>
-                <li class="has-childs">
-                    <span><i></i><a href="">Record 0-6</a></span>
                 </li>
             </ul>
         </aside>
-        <main></main>
+        <main id="tree-form">
+            <h3></h3>
+            <p></p>
+        </main>
     </section>
 </body>
 </html>
