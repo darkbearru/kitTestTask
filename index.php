@@ -10,7 +10,7 @@ use abramenko\template;
 
 $router = new Router ();
 $router->addPath ('default', "indexPage");
-$router->addPath ('/news/', "newsPage");
+$router->addPath ('/admin/', "administratorPage");
 $router->run ();
 
 exit;
@@ -22,7 +22,7 @@ function indexPage ()
     $template->show (["hello", "answer"], 'index.html');
 }
 
-function newsPage ()
+function administratorPage ()
 {
-    echo "You selected news<br />";
+    echo "You selected Admin Section<br />";
 }
