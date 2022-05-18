@@ -4,7 +4,7 @@ namespace abramenko;
 
 class Router 
 {
-    private array $_routerPaths;
+    private $_routerPaths;
 
     public function __construct () 
     {

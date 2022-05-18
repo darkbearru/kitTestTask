@@ -9,15 +9,15 @@ session_start();
  */
 class Authorization
 {
-    private bool $_isLogined;
-    private string $_sessionID;
-    private DB $_db;
-    private object $_user;
+    private $_isLogined;
+    private $_sessionID;
+    private $_db;
+    private $_user;
 
     public function __construct ()
     {
         $this->_db = new DB ();
-        $this->_db::checkDB ();
+        $this->_db->checkDB ();
 
         $this->_sessionID = session_id ();        
     }
@@ -36,8 +36,7 @@ class Authorization
 
     public function Login ($user, $password)
     {
-        $password = md5 ($password);
-        $result = $this->_db->Query ("select id, login from users where login='{$user}' and password='{$password}'", true);
+        $result = $this->_db->Query ("select id, login from users where login='{$user}' and password=password('{$password}')", true);
         $error = false;
 
         if (!empty ($result)) {

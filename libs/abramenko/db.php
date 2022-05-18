@@ -90,21 +90,21 @@ class DB
         echo "Creating table<br />";
         self::Query (
             "CREATE TABLE `users` (
-            `id` int unsigned NOT NULL AUTO_INCREMENT,
-            `login` varchar(32) DEFAULT NULL,
+            `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+            `login` varchar(50) DEFAULT NULL,
             `password` varchar(100) DEFAULT NULL,
             `session` varchar(32) DEFAULT NULL,
             PRIMARY KEY (`id`),
-            KEY `users_login_IDX` (`login`,`password`) USING BTREE,
-            KEY `users_session_IDX` (`session`) USING BTREE
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+            KEY `login` (`login`,`password`),
+            KEY `ses` (`session`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
         );
     }
 
     private static function createAdminUser ()
     {
         echo "Create admin user<br />";
-        self::Query ("insert into users (login, password) values ('admin', '".md5('password')."')");
+        self::Query ("insert into users (login, password) values ('admin', password('password'))");
     }
 
     private static function getRecords ($result)
