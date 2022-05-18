@@ -1,9 +1,10 @@
 <?php
-echo "Test";
 
-require_once ("__autoload.inc");
+require_once ("__autoload.php");
 
 use abramenko\router;
+use abramenko\authorization;
+use abramenko\DB;
 
 $router = new Router ();
 $router->addPath ('default', "indexPage");
@@ -14,7 +15,7 @@ exit;
 
 function indexPage ()
 {
-    echo "You see index page<br />";
+    $_auth = new Authorization ();
 }
 
 function newsPage ()
