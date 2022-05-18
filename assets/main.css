@@ -60,7 +60,9 @@ aside ul {
     padding: 0;
 }
 
-.my-tree {}
+.my-tree {
+    position: relative;
+}
 
 .my-tree li {
     font-size: 1rem;
@@ -87,6 +89,7 @@ aside ul {
 
 .my-tree li.has-childs>span>i {
     border-color: #222;
+    cursor: pointer;
 }
 
 .my-tree li.has-childs>span>i::before,
@@ -120,7 +123,7 @@ aside ul {
     display: inline-block;
     vertical-align: middle;
     text-decoration: none;
-    padding: 0.5rem 1.6rem 0.5rem 1rem;
+    padding: 0.5rem 2rem 0.5rem 1rem;
 }
 
 .my-tree span a {
@@ -138,14 +141,14 @@ aside ul {
 }
 
 .my-tree li.has-childs>span:hover>i,
-.my-tree li.selected>span>i {
+.my-tree li.has-childs.selected>span>i {
     border-color: #fefefe;
 }
 
 .my-tree li.has-childs>span:hover>i::before,
 .my-tree li.has-childs>span:hover>i::after,
-.my-tree li.selected>span>i::before,
-.my-tree li.selected>span>i::after {
+.my-tree li.has-childs.selected>span>i::before,
+.my-tree li.has-childs.selected>span>i::after {
     background-color: #fefefe;
 }
 
@@ -154,11 +157,11 @@ aside ul {
     padding-left: 1rem;
 }
 
-.my-tree li.selected span a {
+.my-tree li.selected>span a {
     cursor: default;
 }
 
-.my-tree li.selected span,
-.my-tree li.selected span:hover {
+.my-tree li.selected>span,
+.my-tree li.selected>span:hover {
     background-color: #284e74;
 }
