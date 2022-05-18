@@ -93,7 +93,10 @@ class DB
             `id` int unsigned NOT NULL AUTO_INCREMENT,
             `login` varchar(32) DEFAULT NULL,
             `password` varchar(100) DEFAULT NULL,
-            PRIMARY KEY (`id`)
+            `session` varchar(32) DEFAULT NULL,
+            PRIMARY KEY (`id`),
+            KEY `users_login_IDX` (`login`,`password`) USING BTREE,
+            KEY `users_session_IDX` (`session`) USING BTREE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
         );
     }

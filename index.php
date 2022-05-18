@@ -16,6 +16,12 @@ exit;
 function indexPage ()
 {
     $_auth = new Authorization ();
+    echo "<pre>";
+    print_r ($_auth->Login ('admin', 'password'));
+    echo "</pre>";
+    echo "<pre>";
+    print_r ($_auth->Logout ());
+    echo "</pre>";
 }
 
 function newsPage ()
