@@ -1,4 +1,4 @@
-import {treeForm} from './tree-form.js';
+import {treeForm} from './tree-form.js?01';
 
 class myTree
 {
@@ -20,14 +20,14 @@ class myTree
 
     /**
      * Установка начальных переменных, а так же обработчиков событий
+     * А также загрузка дерева в случае если оно пустое
      */
     setupTree ()
     {
-        this._tree = [];
         this._selected = false;
 
         if (this.idTree.children.length !== 0) {
-            this._tree = this.loadTreeFromHtml (this.idTree.children);
+            this.loadTreeFromHtml (this.idTree.children);
             this.setupTreeEvents ();
         } else {
             this.loadTree ();
@@ -82,6 +82,12 @@ class myTree
             this.setupLiEvents (item);
             item.classList.add("ready");
         });
+        document.addEventListener ('click', e => {
+            let strictNodes = ['A', 'BUTTON', 'INPUT', 'TEXTAREA'];
+            if (strictNodes.indexOf (e.target.nodeName) === -1) {
+                this.clearSelection ();
+            }
+        });
     }
 
     /**
@@ -112,21 +118,45 @@ class myTree
             item = item.parentNode;
         }
         if (item.nodeName === 'SPAN') {
-            let li = item.parentNode;
-            li.classList.toggle ('selected');
-            if (li.classList.contains ('selected')) {
-                if (this._selected) {
-                    this._selected.classList.remove ('selected');
-                }
-                this._selected = li;
-                console.log (li._data);
-            }
+            this.onItemSelected (item);
         } else {
             let li = item.parentNode.parentNode;
             if (li.classList.contains ('has-childs')) {
                 li.classList.toggle ('is-open');
             }
         }
+    }
+
+    /**
+     * Выделение элемента стилями
+     * а также отображение данных в форме
+     * @param {HTMLElement} item 
+     */
+    onItemSelected (item)
+    {
+        let li = item.parentNode;
+        li.classList.toggle ('selected');
+        if (li.classList.contains ('selected')) {
+            if (this._selected) {
+                this._selected.classList.remove ('selected');
+            }
+            this._selected = li;
+            if (this._form && li._data) this._form.showInfo (li._data.name, li._data.text);
+        } else {
+            if (this._form) this._form.showInfo ('', '');
+        }
+    }
+
+    /**
+     * Очищаем выделение
+     */
+    clearSelection ()
+    {
+        if (this._selected) {
+            this._selected.classList.remove ('selected');
+        }
+        this._selected = false;
+        if (this._form) this._form.showInfo ('', '');
     }
 
     /**
@@ -148,7 +178,7 @@ class myTree
         let buffer = this.createHTMLTree (data);
         this.idTree.innerHTML = '';
         this.idTree.appendChild(buffer);
-        this.setupTree ();
+        this.setupTreeEvents ();
     }
 
     /**
@@ -171,6 +201,7 @@ class myTree
                 let ul = document.createElement ('ul');
                 ul.appendChild (this.createHTMLTree (item.childs));
                 li.appendChild (ul);
+                li.classList.add ('has-childs');
             }
 
             frag.appendChild (li);
@@ -180,4 +211,4 @@ class myTree
 
 }
 
-const tree = new myTree ();
+const my_tree = new myTree ();

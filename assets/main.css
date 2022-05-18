@@ -52,6 +52,11 @@ section>aside {
 
 section>main {
     width: auto;
+    align-self: flex-start;
+}
+section>main h3 {
+    margin-top: 0.35rem;
+    padding-top: 0px;
 }
 
 aside ul {
@@ -164,4 +169,11 @@ aside ul {
 .my-tree li.selected>span,
 .my-tree li.selected>span:hover {
     background-color: #284e74;
+}
+
+.is-admin .my-tree li>ul {
+    display: block;
+}
+.is-admin .my-tree li>span>i {
+    display: none;
 }
