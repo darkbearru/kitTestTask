@@ -15,13 +15,16 @@ export class treeAdminForm extends treeForm {
     setupForm ()
     {
         this.form = this.idForm.querySelector ('form');
-        this.formHeader = this.idForm.querySelector ('form input[name=name]');
-        this.formDescription = this.idForm.querySelector ('form textarea');
-        this.btnSave = this.idForm.querySelector ('.btn-submit');
-        this.btnCancel = this.idForm.querySelector ('.btn-cancel');
+
+        this.formHeader = this.form.querySelector ('input[name=name]');
+        this.formText = this.form.querySelector ('textarea');
+        this.formParent = this.form.querySelector ('select');
+        this.btnSave = this.form.querySelector ('.btn-submit');
+        this.btnCancel = this.form.querySelector ('.btn-cancel');
 
         this.formHeader.addEventListener ('keyup', (e) => this.changeStatus (e));
-        this.formDescription.addEventListener ('keyup', (e) => this.changeStatus (e));
+        this.formText.addEventListener ('keyup', (e) => this.changeStatus (e));
+        this.formParent.addEventListener ('change', (e) => this.changeStatus (e));
         this.btnCancel.addEventListener ('click', e => {return this.onCancel(e)});
         this.btnSave.addEventListener ('click', e => {return this.onSave(e)});
         this.form.addEventListener ('submit', e => {return this.onSave(e)});
@@ -33,7 +36,10 @@ export class treeAdminForm extends treeForm {
     {
         this._itemData = data;
         this.formHeader.value = (data ? data.name : '');
-        this.formDescription.value = (data ? data.text : '');
+        this.formText.value = (data ? data.text : '');
+        if (!data) {
+            this.formParent.innerHTML = '';
+        }
         this.changeStatus ();
     }
 
@@ -41,14 +47,17 @@ export class treeAdminForm extends treeForm {
     {
         let changed = false;
         let name = this.formHeader.value.trim ();
-        let text = this.formDescription.value; 
+        let text = this.formText.value; 
+        let upid = this.formParent.value;
         let isNew = false;
+
         if (this._itemData){
             isNew = this._itemData.isNew;
             if (
                 isNew || 
                 name !== this._itemData.name  || 
-                text !== this._itemData.text  
+                text !== this._itemData.text ||
+                upid != this._itemData.upid
             ) {
                 changed = true;
             }
@@ -78,7 +87,10 @@ export class treeAdminForm extends treeForm {
         e.preventDefault ();
         let data = this._itemData;
         let name = this.formHeader.value.trim ();
-        let text = this.formDescription.value; 
+        let text = this.formText.value;
+        let upid = this.formParent.value;
+                
+        data.upid = upid;
         data.name = name;
         data.text = text.replace(/\n/gi, "\\n");
        
@@ -105,12 +117,37 @@ export class treeAdminForm extends treeForm {
     disableFormFields ()
     {
         this.formHeader.setAttribute ("disabled", "");
-        this.formDescription.setAttribute ("disabled", "");
+        this.formText.setAttribute ("disabled", "");
+        this.formParent.setAttribute ("disabled", "");
     }
 
     enableFormFields ()
     {
         this.formHeader.removeAttribute ("disabled");
-        this.formDescription.removeAttribute ("disabled");
+        this.formText.removeAttribute ("disabled");
+        this.formParent.removeAttribute ("disabled");
+    }
+
+    /**
+     * Формируем Select на основе переданных данных
+     */
+    makeSelect (list, item)
+    {
+        const selected = (item ? Number(item._data.upid) : 0);
+        const id = (item ? Number(item._data.id) : false);
+
+        let options = '<option value="0">Корень</option>';
+        let strict = list.find (el => el.id === id);
+        strict = strict ? strict.strict : [];
+
+        for (let option of list) {
+            if (id !== option.id && strict.indexOf(option.id) === -1) {
+                options += `<option value="${option.id}"` + 
+                            (option.id === selected ? " selected" : "") + 
+                            `>${option.name}</option>`;
+            }
+        }
+        this.formParent.innerHTML = options;
+        this.changeStatus ();
     }
 }

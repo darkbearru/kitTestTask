@@ -93,7 +93,7 @@ class Controller
                     break;
                 }
                 case "PUT" : {
-                    $results = $db->Query ("update posts set name='{$name}', text='{$text}', changed=now() where id='{$id}'");
+                    $results = $db->Query ("update posts set upid='{$upid}', name='{$name}', text='{$text}', changed=now() where id='{$id}'");
                     break;
                 }
             }

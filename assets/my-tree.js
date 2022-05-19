@@ -93,7 +93,7 @@ export class myTree
     setupDocumentClick ()
     {
         document.addEventListener ('click', e => {
-            let strictNodes = ['A', 'BUTTON', 'INPUT', 'TEXTAREA'];
+            let strictNodes = ['A', 'BUTTON', 'INPUT', 'TEXTAREA', 'SELECT', 'OPTION', 'FORM'];
             if (strictNodes.indexOf (e.target.nodeName) === -1) {
                 this.clearSelection ();
             }
@@ -151,7 +151,7 @@ export class myTree
                 this._selected.classList.remove ('selected');
             }
             this._selected = li;
-            if (this._form && li._data) this._form.showInfo (li._data);
+            if (this._form && li._data) this._form.showInfo ({...li._data});
         } else {
             if (this._form) this._form.showInfo (false);
         }

@@ -1,5 +1,5 @@
 import { myTree } from './my-tree.js';
-import { treeAdminForm } from './tree-admin-form.js';
+import { treeAdminForm } from './tree-admin-form.js?0';
 import { myFetch, makeQueryParams } from './my-fetch.js?1';
 
 export class adminTree extends myTree
@@ -44,8 +44,8 @@ export class adminTree extends myTree
     {
         if (this._isEditing) return false;
         super.onItemSelected (item);
-        console.log (this._selected._data);
         this.enableButtonsForSelection ();
+        this._form.makeSelect (this.selectTree, this._selected);
         this._form.enableFormFields ();
     }
 
@@ -74,6 +74,7 @@ export class adminTree extends myTree
         }
         this.onItemSelected (li.children[0]);
         this.disableAddButtons ();
+        this._form.makeSelect (this.selectTree, this._selected);
         this._form.enableFormFields ();
     }
 
@@ -123,6 +124,9 @@ export class adminTree extends myTree
         return true;
     }
 
+    /**
+     * Удаление элемента из дерева
+     */
     deleteItemFromTree ()
     {
         this._selected.parentNode.removeChild (this._selected);
@@ -131,6 +135,9 @@ export class adminTree extends myTree
         this.enableAddButtons ();
     }
 
+    /**
+     * Отключаем все кнопки «добавления»
+     */
     disableAddButtons ()
     {
         this._isEditing = true;
@@ -138,6 +145,9 @@ export class adminTree extends myTree
         this._btnAddChild.setAttribute ("disabled", "");
     }
 
+    /**
+     * Включаем все кнопки добавления
+     */
     enableAddButtons ()
     {
         this._isEditing = false;
@@ -161,30 +171,145 @@ export class adminTree extends myTree
         this._btnDelete.removeAttribute ("disabled");
     }
 
+    /**
+     * Изменяем данные в дереве, после сохранения в базу
+     * @param {Object} data 
+     * @returns {Boolean}
+     */
     changeItemData (data)
     {
         if (!this._selected) return false;
+
+        const oldUpid = this._selected._data.upid;
+
 
         this._selected.querySelector ('a').innerText = data.name;
 
         let {id,upid,name,text,childs} = data; 
         if (data.isNew && upid !== 0) {
-            let _parent = this._selected.parentNode;
-            if (_parent.nodeName === 'UL') {
-                _parent = _parent.parentNode;
-            }
-            _parent._data.childs = true;
-            _parent.classList.add ('has-childs');
+            this.updateParent ();
         }
 
         this._selected._data = {id, upid, name, text, childs};
+
+        if (upid != oldUpid) {
+            this.changeTreeItemParent (upid);
+        }
+
         this._isEditing = false;
         this.clearSelection ();
 
         if (data.isNew) {
             super.setupTreeEvents ();
             this.enableAddButtons ();
+            this.makeSelectTree ();
         }
     }
+
+    /**
+     * Меняем класс и поле данных у родителя
+     * в случае наличия потомков или их отсутствия
+     * @param {Boolean} hasChilds 
+     */
+    updateParent (hasChilds = true)
+    {
+        let _parent = this._selected.parentNode;
+        if (_parent.nodeName === 'UL') {
+            _parent = _parent.parentNode;
+        }
+        _parent._data.childs = hasChilds;
+        if (hasChilds){
+            _parent.classList.add ('has-childs');
+        } else {
+            _parent.classList.remove ('has-childs');
+        }
+
+    }
+
+    /**
+     * Замена родителя у элемента
+     * и все сопутствующие с этим действия
+     * @param {Number} upid 
+     */
+    changeTreeItemParent (upid)
+    {
+        // Очищаем настройки старого родителя
+        this.updateParent (false);
+        console.log (this._selected.parentNode);
+        let oldParent = this._selected.parentNode;
+
+        // Ищем новый
+        const newParent = this.findTreeItemById (upid);
+        
+        console.log (newParent);
+        
+        let ul = newParent.querySelector('ul');
+        if (!ul) {
+            ul = document.createElement ('ul');
+            newParent.appendChild (ul);
+        }
+        ul.appendChild (this._selected);
+        this.updateParent (true);
+
+        // Подчищаем у старого родителя
+        if (oldParent.children.length === 0) {
+            oldParent.parentNode.removeChild (oldParent);
+        }
+        // Обновляем сохранённое дерево
+        this.makeSelectTree ();
+    }
+
+    /**
+     * Загрузка дерева из базы
+     * переопределяем метод для вызова дополнительной обработки
+     * @param {Array} data 
+     */
+    loadTreeFinished (data)
+    {
+        super.loadTreeFinished (data)
+        this.makeSelectTree ();
+    }
+
+    /**
+     * Формирование из дерева списка родителя для select
+     */
+    async makeSelectTree ()
+    {
+        let res = [];
+        this.selectTree = [];
+        res = await this.getTreeItems (this.idTree, res);
+        this.selectTree = res.result;
+    }
+
+    getTreeItems (parent, result, level = 0)
+    {
+        let offset = "&nbsp; &nbsp;".repeat (level + 1);
+        let strict = [];
+        const list = parent.children;
+
+        for (let item of list) {
+            let {id, name} = item._data;
+            result.push ({id : Number(id), strict : [], name : offset + name, link: item});
+            // Формируем список Id в которые нельзя помещать родителя
+            strict.push (Number(id));
+            let idx = result.length - 1;
+            let ul = item.querySelector ('ul');
+            //
+            if (ul) {
+                let res = this.getTreeItems (ul, result, level + 1);
+                result = res.result;
+                result[idx].strict = res.strict;
+                strict = [...strict, ...res.strict];
+            }
+        }
+        return {result, strict};
+    }
+
+    findTreeItemById (id)
+    {
+        id = Number (id);
+        return this.selectTree.find (item => id == item.id).link;
+    }    
+
 
 }

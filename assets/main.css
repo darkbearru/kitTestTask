@@ -220,7 +220,8 @@ form > div {
 }
 
 form>div>input,
-form>div>textarea {
+form>div>textarea,
+form>div>select {
     width: 100%;
     box-sizing: border-box;
     border: 1px solid #222;
@@ -230,7 +231,18 @@ form>div>textarea {
     color: #222;
 }
 form>div>textarea {
-    height:  200px;
+    height:  160px;
+}
+input, textarea, select {
+    background-color: #fff;
+}
+input[disabled],
+input:disabled,
+textarea[disabled],
+textarea:disabled, 
+select[disabled],
+select:disabled {
+    opacity: 0.4;
 }
 
 form>div>input::placeholder {
@@ -252,7 +264,8 @@ input[type="submit"] {
 }
 
 #tree-form > form h4 {
-    margin: 0 0 .4rem 0;
+    font-weight: 400;
+    margin: 0 0 .2rem 0;
 }
 .btn-submit{
     background-color: #4088a9;
@@ -265,7 +278,7 @@ input[type="submit"] {
     margin-right: 1rem;
 }
 
-button [disabled],
+button[disabled],
 button:disabled,
 .btn-submit:disabled,
 .btn-submit[disabled] {
