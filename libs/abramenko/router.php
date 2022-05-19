@@ -21,6 +21,8 @@ class Router
     public function run ()
     {
         $_url = !empty ($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
+        $_params = explode ('?', $_url);
+        $_url = $_params[0];
 
         if (!empty ($this->_routerPaths[$_url])) {
             $_action = $this->_routerPaths[$_url];
