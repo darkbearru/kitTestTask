@@ -208,6 +208,12 @@ export class myTree
 
     createTreeItem (item)
     {
+        item = item || {
+            id: "",
+            upid: "",
+            name: "<<< Новый элемент >>>",
+            text: "<<< Описание нового элемента >>>"
+        };
         let li = document.createElement ('li');
         li._data = {id: item.id, upid: item.upid, name: item.name, text: item.text, childs: (item.childs ? true : false)};
         li.innerHTML = `<span data-id="${item.id}"><i></i><a href="">${item.name}</a></span>`;

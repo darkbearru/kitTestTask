@@ -1,3 +1,4 @@
+/*
 :root {
     --theme-color1: #ddeb9d;
     --theme-color2: #a7d694;
@@ -7,6 +8,7 @@
     --theme-color-white: #fefefe;
     --theme-color-black: #222;
 }
+*/
 
 body {
     margin: 0px;
@@ -21,12 +23,17 @@ header {
     height: 80px;
     background-color: #fefefe;
     align-items: center;
+    flex-wrap: nowrap;
 }
 
 header h1 {
     font-size: 1.5rem;
     margin: 0;
-    padding: 0 20px;
+    padding: 0 1rem;
+    width: 100%;
+}
+header form {
+    margin-right: 1rem;
 }
 
 footer {
@@ -41,18 +48,21 @@ section {
     border-bottom: 1px solid #222;
     padding: 1rem;
     background-color: #ddeb9d;
+    min-height: 450px;
 }
 
 section>aside {
-    width: 40%;
-    max-height: calc(100vh - 160px);
+    width: 45%;
+}
+section>aside .my-tree {
     position: relative;
+    min-height: 400px;
+    max-height: calc(100vh - 160px);
     overflow-y: scroll;
 }
 
 section>main {
-    width: auto;
-    align-self: flex-start;
+    width: 65%;
 }
 section>main h3 {
     margin-top: 0.35rem;
@@ -173,7 +183,103 @@ aside ul {
 
 .is-admin .my-tree li>ul {
     display: block;
+    padding-left: 1.5rem;
 }
 .is-admin .my-tree li>span>i {
     display: none;
+}
+
+.login-form__wrapper {
+    display: flex;
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    left: 0px;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: rgba(0, 0, 0, .7);
+}
+
+.login-form {
+    position: relative;
+    width: 360px;
+    padding: 2rem;
+    background-color: #fefefe;
+    border-radius: 1rem;
+}
+
+form {
+    margin: 0px;
+    padding: 0px;
+}
+form > div {
+    display: flex;
+    flex-direction: column;
+    padding: 0.4rem 0;
+}
+
+form>div>input,
+form>div>textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #222;
+    border-radius: 0.4rem;
+    padding: 1rem;
+    font-size: 1rem;
+    color: #222;
+}
+form>div>textarea {
+    height:  200px;
+}
+
+form>div>input::placeholder {
+    color:#666;
+}
+form>div>button,
+form>div>input[type="submit"] {
+    align-self: flex-end;
+    width: auto;
+}
+button,
+input[type="submit"] {
+    padding: 1rem 2rem;
+    background-color: #6DB49B;
+    border: none;
+    border-radius: 0.4rem;
+    font-size: 1rem;
+    color: #fff;
+}
+
+#tree-form > form h4 {
+    margin: 0 0 .4rem 0;
+}
+.btn-submit{
+    background-color: #4088a9;
+}
+
+#tree-form .button-line {
+    flex-direction: row-reverse;
+}
+#tree-form .button-line button{
+    margin-right: 1rem;
+}
+
+button [disabled],
+button:disabled,
+.btn-submit:disabled,
+.btn-submit[disabled] {
+    background-color: #AECEA0;
+}
+
+.tree-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row-reverse;
+    min-width: 400px;
+    margin-top: 1rem;
+}
+.tree-buttons button {
+    padding: 0.5rem 1rem;
+    margin-right: 1rem;
 }
