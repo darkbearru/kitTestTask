@@ -4,19 +4,26 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>{{title}}</title>
     <link rel="stylesheet" href="/assets/main.css" type="text/css" />
     <base href="/">
     <script type="module" src="./assets/main.js" async></script>
 </head>
-<body class="">
+<body class="{{is-admin}}">
     <header>
-        <h1>Тестовое здание для компании «КИТ»</h1>
+        <h1>{{caption}}</h1>
     </header>
     <section>
         <aside>
             <ul class="my-tree" id="my-tree">
-
+                {{data-list}}
+                    <li>
+                        <span data-id="{{id}}" data-upid="{{upid}}" data-name="{{name}}" data-text="{{text}}">
+                            <i></i><a href="">{{name}}</a>
+                        </span>
+                        {{childs}}
+                    </li>
+                {{/data-list}}
             </ul>
         </aside>
         <main id="tree-form">
