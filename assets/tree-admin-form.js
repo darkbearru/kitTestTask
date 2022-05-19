@@ -88,6 +88,7 @@ export class treeAdminForm extends treeForm {
             .then (json => {
                 if (json.result == 'ok') {
                     if (this.parent) {
+                        data.text = text;
                         data.id = (typeof json.id !== 'undefined' ? json.id : data.id);
                         data.upid = (typeof json.upid !== 'undefined' ? json.upid : data.upid);
                         this.parent.changeItemData (data);

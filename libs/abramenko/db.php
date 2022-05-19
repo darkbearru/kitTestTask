@@ -10,16 +10,20 @@ class DB
     private static $_isError    = false;
 
     public function __construct (
-        $host = 'localhost', 
+/*        $host = 'localhost', 
         $user = 'test', 
         $password ='password', 
-        $database = 'test'
+        $database = 'test' */
     ){
         self::$_db = &$this;
         if (empty (self::$_mysqli)) {
             mysqli_report (MYSQLI_REPORT_OFF);
 
-            $mysqli = new mysqli ($host, $user, $password, $database);
+            $json = implode (file ($_SERVER['DOCUMENT_ROOT']."/assets/connect-info.json"));
+            $json = json_decode ($json);
+            
+            $mysqli = new mysqli ($json->host, $json->user, $json->password, $json->database);
+            // $mysqli = new mysqli ($host, $user, $password, $database);
 
             if ($mysqli->connect_error)
                 throw new Exception("Connect failed: %s", $mysqli->connect_error);
