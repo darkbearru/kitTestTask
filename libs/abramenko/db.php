@@ -82,7 +82,7 @@ class DB
 
     static function errorsList ()
     {
-        return self::$_mysqli->errors_list;
+        return self::$_mysqli->error_list;
     }
 
     private static function createUsersTable ()

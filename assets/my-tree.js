@@ -146,9 +146,9 @@ export class myTree
                 this._selected.classList.remove ('selected');
             }
             this._selected = li;
-            if (this._form && li._data) this._form.showInfo (li._data.name, li._data.text);
+            if (this._form && li._data) this._form.showInfo (li._data);
         } else {
-            if (this._form) this._form.showInfo ('', '');
+            if (this._form) this._form.showInfo (false);
         }
     }
 
@@ -196,10 +196,7 @@ export class myTree
         const frag = document.createDocumentFragment();
 	    for (let i in data) {
 			if (!data.hasOwnProperty (i)) continue;
-
-
             let item = data[i];
-
             frag.appendChild (this.createTreeItem (data[i]));
             // frag.appendChild (li);
         }

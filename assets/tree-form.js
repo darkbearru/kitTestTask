@@ -20,11 +20,13 @@ export class treeForm {
     {
         this.formHeader = this.idForm.querySelector ('h3');
         this.formDescription = this.idForm.querySelector ('p');
+        this._itemData  = false;
     }
 
-    showInfo (name = '', description = '')
+    showInfo (data = false)
     {
-        this.formHeader.innerText = name;
-        this.formDescription.innerHTML = description.replace (/\n/, '<br />');
+        this._itemData = data;
+        this.formHeader.innerText = (data ? data.name : '');
+        this.formDescription.innerHTML = (data ? data.description.replace (/\n/, '<br />') : '');
     }
 }

@@ -9,7 +9,6 @@ class Controller
 
     public function __construct ()
     {
-        $this->_method = $_SERVER["REQUEST_METHOD"];
 
         $router = new Router ($this);
         $router->addPath ('default', "pageIndex");
@@ -57,10 +56,46 @@ class Controller
 
     public function pageAPI ()
     {
-        $results = $this->getTree ();
-
         $template = new Template ();
-        $template->show ($results);
+        $this->_auth = new Authorization ();
+        
+        if (!empty($_GET['request']) && $this->_auth->isLogined ()) {
+            $method = $_GET['request'];
+            $db = new DB ();
+            $id = intval ($_GET['id']);
+            $upid = intval ($_GET['upid']);
+            $name = htmlentities (addslashes ($_GET['name']));
+            $text = htmlentities (addslashes ($_GET['text']));
+
+            switch ($method) {
+                case "POST" : {
+                    $results = $db->Query ("insert into posts (upid, name, text, changed) values('{$upid}', '{$name}', '{$text}', now())");
+                    $template->show ($results);
+                    break;
+                }
+                case "DELETE" : {
+                    $results = $db->Query ("delete from posts where upid='{$upid}'");
+                    $results = $db->Query ("delete from posts where upid='{$id}'");
+                    $template->show ($results);
+                    break;
+                }
+                case "PUT" : {
+
+                    $results = $db->Query ("update posts set name='{$name}', text='{$text}', changed=now() where id='{$id}'");
+                    if (!$results && $db->isError ()) {
+                        $results = ["error" => $db->errorsList ()];
+                    } else {
+                        $results = [ "result" => "ok" ];
+                    }
+                    $template->show ($results);
+                    break;
+                }
+            }
+        } else {
+            $results = $this->getTree ();
+            $template->show ($results);
+        }
+        
     }
 
     private function collapseTree ($tree)

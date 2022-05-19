@@ -1,5 +1,6 @@
-import {myTree} from './my-tree.js';
-import {treeAdminForm} from './tree-admin-form.js';
+import { myTree } from './my-tree.js';
+import { treeAdminForm } from './tree-admin-form.js';
+import { myFetch, makeQueryParams } from './my-fetch.js?1';
 
 export class adminTree extends myTree
 {
@@ -20,7 +21,7 @@ export class adminTree extends myTree
      */
     setupTreeForm ()
     {
-        this._form = new treeAdminForm ();
+        this._form = new treeAdminForm (this);
     }
 
     /**
@@ -97,7 +98,18 @@ export class adminTree extends myTree
     deleteItem ()
     {
         if (!this._selected) return;
+        
         let data = this._selected._data;
+        data.request = "DELETE";
+        fetch ('/api/' + makeQueryParams (data))
+            .then (response => response.json ())
+            .then (data => console.log (data));
+
+        /** 
+        myFetch ('/api/', 'POST', data)
+            .catch (e => console.log (e))
+            .then (data => console.log (data));
+        */
         if (data.isNew) {
             this._selected.parentNode.removeChild (this._selected);
             this._isEditing = false;
@@ -135,6 +147,19 @@ export class adminTree extends myTree
             this._btnAddChild.removeAttribute ("disabled");
         }
         this._btnDelete.removeAttribute ("disabled");
+    }
+
+    changeItemData (data)
+    {
+        if (!this._selected) return false;
+
+        this._selected.querySelector ('a').innerText = data.name;
+
+        let {id,upid,name,text,childs} = data; 
+        this._selected.children[0]._data = {id, upid, name, text, childs};
+        
+        console.log (this._selected.children[0]._data);
+        this.clearSelection ();
     }
 
 }
