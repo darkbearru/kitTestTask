@@ -32,6 +32,7 @@ export class myTree
         } else {
             this.loadTree ();
         }
+        this.setupDocumentClick ();
         this.setupTreeForm ();
     }
 
@@ -87,6 +88,10 @@ export class myTree
             this.setupLiEvents (item);
             item.classList.add("ready");
         });
+    }
+
+    setupDocumentClick ()
+    {
         document.addEventListener ('click', e => {
             let strictNodes = ['A', 'BUTTON', 'INPUT', 'TEXTAREA'];
             if (strictNodes.indexOf (e.target.nodeName) === -1) {

@@ -22,6 +22,7 @@ export class adminTree extends myTree
     setupTreeForm ()
     {
         this._form = new treeAdminForm (this);
+        this._form.disableFormFields ();
     }
 
     /**
@@ -43,7 +44,9 @@ export class adminTree extends myTree
     {
         if (this._isEditing) return false;
         super.onItemSelected (item);
+        console.log (this._selected._data);
         this.enableButtonsForSelection ();
+        this._form.enableFormFields ();
     }
 
     /**
@@ -54,6 +57,7 @@ export class adminTree extends myTree
         if (this._isEditing) return false;
         super.clearSelection ();
         this.disableButtonsForSelection ();
+        this._form.disableFormFields ();
     }
 
     /**
@@ -70,6 +74,7 @@ export class adminTree extends myTree
         }
         this.onItemSelected (li.children[0]);
         this.disableAddButtons ();
+        this._form.enableFormFields ();
     }
 
     /**
@@ -78,8 +83,10 @@ export class adminTree extends myTree
     addNewSubItem ()
     {
         if (!this._selected) return false;
+
         let li = this.createTreeItem ();
         li._data.isNew = true;
+        li._data.upid = this._selected._data.id;
         let ul = this._selected.querySelector ('ul');
         if (!ul) {
             ul = document.createElement ('ul');
@@ -98,25 +105,30 @@ export class adminTree extends myTree
     deleteItem ()
     {
         if (!this._selected) return;
-        
-        let data = this._selected._data;
-        data.request = "DELETE";
-        fetch ('/api/' + makeQueryParams (data))
-            .then (response => response.json ())
-            .then (data => console.log (data));
 
-        /** 
-        myFetch ('/api/', 'POST', data)
-            .catch (e => console.log (e))
-            .then (data => console.log (data));
-        */
-        if (data.isNew) {
-            this._selected.parentNode.removeChild (this._selected);
-            this._isEditing = false;
-            this.clearSelection ();
-            this.enableAddButtons ();
-            return true;
+        let data = this._selected._data;
+        
+        if (!data.isNew) {
+            data.request = "DELETE";
+            fetch ('/api/' + makeQueryParams (data))
+                .then (response => response.json ())
+                .then (data => {
+                    if (data.result == 'ok') {
+                        this.deleteItemFromTree ();
+                    }
+                });
+        } else {
+            this.deleteItemFromTree ();
         }
+        return true;
+    }
+
+    deleteItemFromTree ()
+    {
+        this._selected.parentNode.removeChild (this._selected);
+        this._isEditing = false;
+        this.clearSelection ();
+        this.enableAddButtons ();
     }
 
     disableAddButtons ()
@@ -156,10 +168,23 @@ export class adminTree extends myTree
         this._selected.querySelector ('a').innerText = data.name;
 
         let {id,upid,name,text,childs} = data; 
-        this._selected.children[0]._data = {id, upid, name, text, childs};
-        
-        console.log (this._selected.children[0]._data);
+        if (data.isNew && upid !== 0) {
+            let _parent = this._selected.parentNode;
+            if (_parent.nodeName === 'UL') {
+                _parent = _parent.parentNode;
+            }
+            _parent._data.childs = true;
+            _parent.classList.add ('has-childs');
+        }
+
+        this._selected._data = {id, upid, name, text, childs};
+        this._isEditing = false;
         this.clearSelection ();
+
+        if (data.isNew) {
+            super.setupTreeEvents ();
+            this.enableAddButtons ();
+        }
     }
 
 }

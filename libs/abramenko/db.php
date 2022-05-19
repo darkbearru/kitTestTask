@@ -66,12 +66,10 @@ class DB
             self::$_isError = true;
             return false;
         } 
-        
         $_result = self::getRecords ($_result);
         if (!empty ($_result) && $singleRecord) {
             $_result = $_result[0];
         }
-
         return $_result;
     }
 
@@ -83,6 +81,11 @@ class DB
     static function errorsList ()
     {
         return self::$_mysqli->error_list;
+    }
+
+    static function insertID ()
+    {
+        return self::$_mysqli->insert_id;
     }
 
     private static function createUsersTable ()
@@ -97,6 +100,17 @@ class DB
             PRIMARY KEY (`id`),
             KEY `login` (`login`,`password`),
             KEY `ses` (`session`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+        );
+        self::Query ("DROP TABLE IF EXISTS `posts`;");
+        self::Query (
+            "CREATE TABLE `posts` (
+            `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+            `upid` int(11) DEFAULT '0',
+            `name` varchar(200) DEFAULT NULL,
+            `text` text,
+            `changed` timestamp NULL DEFAULT NULL,
+            PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
         );
     }

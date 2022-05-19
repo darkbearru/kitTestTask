@@ -41,7 +41,7 @@ export class treeAdminForm extends treeForm {
     {
         let changed = false;
         let name = this.formHeader.value.trim ();
-        let text = this.formDescription.value.trim (); 
+        let text = this.formDescription.value; 
         let isNew = false;
         if (this._itemData){
             isNew = this._itemData.isNew;
@@ -78,17 +78,18 @@ export class treeAdminForm extends treeForm {
         e.preventDefault ();
         let data = this._itemData;
         let name = this.formHeader.value.trim ();
-        let text = this.formDescription.value.trim (); 
+        let text = this.formDescription.value; 
         data.name = name;
-        data.text = text;
-
+        data.text = text.replace(/\n/gi, "\\n");
+       
         data.request = data.isNew ? 'POST' : 'PUT';
         fetch ('/api/' + makeQueryParams (data))
             .then (response => response.json ())
             .then (json => {
-                if (json.result == 'ok')
-                {
+                if (json.result == 'ok') {
                     if (this.parent) {
+                        data.id = (typeof json.id !== 'undefined' ? json.id : data.id);
+                        data.upid = (typeof json.upid !== 'undefined' ? json.upid : data.upid);
                         this.parent.changeItemData (data);
                     }
                 } else {
@@ -98,5 +99,17 @@ export class treeAdminForm extends treeForm {
             });
 
         return false;
+    }
+
+    disableFormFields ()
+    {
+        this.formHeader.setAttribute ("disabled", "");
+        this.formDescription.setAttribute ("disabled", "");
+    }
+
+    enableFormFields ()
+    {
+        this.formHeader.removeAttribute ("disabled");
+        this.formDescription.removeAttribute ("disabled");
     }
 }
