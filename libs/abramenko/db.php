@@ -100,10 +100,18 @@ class DB
             `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
             `login` varchar(50) DEFAULT NULL,
             `password` varchar(100) DEFAULT NULL,
-            `session` varchar(32) DEFAULT NULL,
             PRIMARY KEY (`id`),
-            KEY `login` (`login`,`password`),
-            KEY `ses` (`session`)
+            KEY `loginidx` (`login`,`password`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
+        );
+        self::Query ("DROP TABLE IF EXISTS `sessions`;");
+        self::Query (
+            "CREATE TABLE `sessions` (
+            `id` varchar (50),
+            `user_id` int(11),
+            `activity` timestamp,
+            PRIMARY KEY (`id`),
+            KEY `activityidx` (`activity`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
         );
         self::Query ("DROP TABLE IF EXISTS `posts`;");
@@ -112,7 +120,7 @@ class DB
             `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
             `upid` int(11) DEFAULT '0',
             `name` varchar(200) DEFAULT NULL,
-            `text` text,
+            `description` text,
             `changed` timestamp NULL DEFAULT NULL,
             PRIMARY KEY (`id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;"
@@ -122,7 +130,8 @@ class DB
     private static function createAdminUser ()
     {
         echo "Create admin user<br />";
-        self::Query ("insert into users (login, password) values ('admin', password('password'))");
+        $password = md5("password");
+        self::Query ("insert into users (login, password) values ('admin', password('$password'))");
     }
 
     private static function getRecords ($result)
