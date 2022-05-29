@@ -19,30 +19,27 @@ class Authorization
         $this->_db = new DB ();
         $this->_db->checkDB ();
 
-        $this->_sessionID = session_id ();        
+        $this->_sessionID = session_id ();
+        $this->checkLogined ();
     }
 
     public function isLogined ()
     {
-        if (!$this->_isLogined) {
-            $result = $this->_db->Query ("select id, login from users where session='{$this->_sessionID}'", true);
-            if (!empty ($result)) {
-                $this->_user = $result;
-                $this->_isLogined = true;
-            }
-        }
         return $this->_isLogined;
     }
 
     public function Login ($user, $password)
     {
+        $password = md5($password);
         $result = $this->_db->Query ("select id, login from users where login='{$user}' and password=password('{$password}')", true);
         $error = false;
 
         if (!empty ($result)) {
             $this->_user = $result;
             $this->_isLogined = true;
-            $this->_db->Query ("update users set session='{$this->_sessionID}' where id='{$result->id}'");
+            $this->_db->Query ("delete from sessions where user_id='{$result->id}'");
+    
+            $this->_db->Query ("insert into sessions (id, user_id, activity) values ('{$this->_sessionID}', '{$result->id}', now())");
         } else {
             if (!$this->_db->isError ()) {
                 $error = (object) ['error' => "Неверный пользователь или пароль"];
@@ -73,5 +70,22 @@ class Authorization
             'error' => $error,
             'result' => (object) $result
         ];
+    }
+
+    protected function checkLogined ()
+    {
+        // Удаляем все старые сессии
+        $this->_db->Query ("DELETE FROM sessions WHERE activity<DATE_ADD(now(), INTERVAL -30 MINUTE)");
+        if (!$this->_isLogined) {
+            $result = $this->_db->Query (
+                "SELECT users.login FROM sessions LEFT JOIN users on sessions.user_id=users.id
+                WHERE sessions.id='{$this->_sessionID}'", 
+                true);
+            if (!empty ($result)) {
+                $this->_user = $result;
+                $this->_isLogined = true;
+                $this->_qb->Query ("UPDATE sessions set activity=now() where id='{$this->_sessionID}'");
+            }
+        }
     }
 }
