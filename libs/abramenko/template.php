@@ -16,20 +16,21 @@ class Template
 
     public function show ($data, $htmlFile = false)
     {
+        if (!empty ($data['json'])) $htmlFile = false;
         if (!file_exists ($this->_folder.$htmlFile) || !$htmlFile) {
             $this->returnJSON ($data);
         }
         $this->returnHtml ($data, $this->_folder.$htmlFile);
     }
 
-    private function returnJSON ($data)
+    protected function returnJSON ($data)
     {
         $this->makeHeader (true);
         echo json_encode ($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    private function returnHTML ($data, $templateFile)
+    protected function returnHTML ($data, $templateFile)
     {
         $this->makeHeader ();
         $file = implode ('', file ($templateFile));
@@ -41,12 +42,12 @@ class Template
         exit;
     }
 
-    private function makeHeader ($isJSON = false) {
+    protected function makeHeader ($isJSON = false) {
         header ('Content-type: '.($isJSON ? 'application/json' : 'text/html').'; charset=utf-8');
         header ('Last-Modified: '.date ('Y-m-d H:i:s'));
     }
 
-    private function placeVariables ($variables, $html)
+    protected function placeVariables ($variables, $html)
     {
         $variables = (array) $variables;
         foreach ($variables as $key => $value) {
@@ -55,27 +56,32 @@ class Template
             } else {
                 if (is_array ($value) || is_object ($value)) {
                     $value = (array) $value;
-                    if (empty ($value)) {
-                        $html = preg_replace ("/\{\{(${key})\}\}(.*?)\{\{\/${key}\}\}/uis", '', $html);
-                    } else if (preg_match_all ("/\{\{(${key})\}\}(.*?)\{\{\/${key}\}\}/uis", $html, $matches, PREG_SET_ORDER)){
-
-                        $_html = '';
-                        foreach ($matches as $matchStr) {
-                            foreach ($value as $_key => $_val) {
-                                if (!empty ($matchStr[2])) {
-                                    $_html .= $this->placeVariables ([$_key => $_val], $matchStr[2]);
-                                }
-                            }
-                        }
-                        preg_replace ("/\{\{(${key})\}\}(.*?)\{\{\/${key}\}\}/uis", $_html, $html);
-                    }
+                    $html = $this->placeArray ($key, $value, $html);
                 }
             }
         }
         return $html;
     }
 
-    private function clearNotSet ($html)
+    protected function placeArray ($key, $value, $html)
+    {
+        if (empty ($value)) {
+            $html = preg_replace ("/\{\{(${key})\}\}(.*?)\{\{\/${key}\}\}/uis", '', $html);
+        } else if (preg_match_all ("/\{\{(${key})\}\}(.*?)\{\{\/${key}\}\}/uis", $html, $matches, PREG_SET_ORDER)){
+            $_html = '';
+            foreach ($matches as $matchStr) {
+                foreach ($value as $_key => $_val) {
+                    if (!empty ($matchStr[2])) {
+                        $_html .= $this->placeVariables ([$_key => $_val], $matchStr[2]);
+                    }
+                }
+            }
+            preg_replace ("/\{\{(${key})\}\}(.*?)\{\{\/${key}\}\}/uis", $_html, $html);
+        }
+        return $html;
+    }
+
+    protected function clearNotSet ($html)
     {
         return preg_replace('/\{\{(\/?[\w\-]{2,})\}\}/uis', '', $html); 
     }
