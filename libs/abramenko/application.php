@@ -2,58 +2,95 @@
 
 namespace abramenko;
 
-class Controller
+class Application
 {
     private $_auth;
+    private $_router;
+    private $_pageData;
    
     public function __construct ()
     {
+        $router = new Router ($this, "pageIndex");
 
-        $router = new Router ($this);
-        $router->addPath ('default', "pageIndex");
-        $router->addPath ('/admin/', "pageAdmin");
-        $router->addPath ('/api/', "pageAPI");
-        $router->run ();
+        $router->get ('/admin/', "getAdmin");
+        $router->post ('/admin/', "postAdmin");
+        $router->get ('/api/', "getAPI");
+        $router->put ('/api/', "getAPI");
+        $router->delete ('/api/', "getAPI");
+        $router->post ('/api/', "getAPI");
+
+        $this->_auth = new Authorization ();
+        $this->_router = $router;
+        $this->_pageData = [
+            "title"     => "Тестовое задание",
+            "caption"   => "Тестовое задание для компании «КИТ»",
+            "data-list" => [],
+            "is-logined"=> [],
+            "login-form"=> []
+        ];
+    }
+
+    public function run ()
+    {
+        return $this->_router->run ();
     }
 
     public function pageIndex ()
     {
-        $template = new Template ();
-        $template->show (
-            [
-                "title" => "Тестовое задание",
-                "caption" => "Тестовое задание для компании «КИТ»",
-                "data-list" => []
-            ], 
-            'index.html'
-        );
+        $posts = new Posts ();
+        $tree = $posts->getTree ();
+        if (empty ($tree["error"])) {
+            $this->_pageData["data-list"] = $posts->htmlTree ($tree);
+        }
+        return $this->_pageData;
     }
 
-    public function pageAdmin ()
+    public function getAdmin ()
     {
-        $data = [
-            "title" => "Администрирование",
-            "caption" => "Тестовое задание для компании «КИТ». Администрирование",
-            "data-list" => [],
-            "login-form" => []
-        ];
-        $this->_auth = new Authorization ();
+        $this->_pageData["title"]   = "Администрирование";
+        $this->_pageData["caption"] = "Тестовое задание для компании «КИТ». Администрирование";
         
-        $this->checkLoginLogout ();
 
         if ($this->_auth->isLogined ()) {
-            $data["is-logined"] =  (object) ["show" => true];
-            $data["login-form"] = [];
+            $this->_pageData["is-logined"] =  (object) ["show" => true];
         } else {
-            $data["is-logined"] = [];
-            $data["login-form"] = (object) ["show" => true];
+            $this->_pageData["login-form"] = (object) ["show" => true];
         }
 
-        $template = new Template ();
-        $template->show ($data, 'admin.html');
+        return $data;
     }
 
-    public function pageAPI ()
+    public function postAdmin ($params)
+    {
+        $this->checkLoginLogout ();
+        $this->getAdmin ();
+    }
+
+    public function getAPI ()
+    {
+        $this->_auth = new Authorization ();
+        return [
+            "json"  => true,
+            "is-logined" => $this->_auth->isLogined (),
+            "data"  => $this->getTree ()
+        ];
+    }
+
+    public function putAPI ($params = false)
+    {
+        $this->_auth = new Authorization ();
+        if (!$this->_auth->isLogined ()) {
+            return [
+                "error" => ["Требуется авторизация"]
+            ];
+        }
+        echo '<pre>';
+        print_r ($params);
+        echo '</pre>';
+
+    }
+
+    public function pageAPI2 ()
     {
         $template = new Template ();
         $this->_auth = new Authorization ();
@@ -124,18 +161,6 @@ class Controller
                 }
                 $result[] = (object) $item;
             }
-            /*            
-            if ($item->upid != 0) {
-                if (!empty ($result[$item->upid])) {
-                    if (empty ($result[$item->upid]->childs)) {
-                        $result[$item->upid]->childs = [];
-                    }
-                    $result[$item->upid]->childs[] = $item;                
-                }
-            } else {
-                $result[$item->id] = (object) $item;
-            }
-            */
         }
         return $result;
     }
