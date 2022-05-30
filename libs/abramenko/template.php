@@ -14,6 +14,10 @@ class Template
         $this->_folder = $_SERVER['DOCUMENT_ROOT']."/{$folder}/";
     }
 
+    /**
+     * Выводим шаблон, если не передано имя шаблона, или один из параметров json
+     * Тогда возвращаем JSON, в остальных случаях HTML
+     */
     public function show ($data, $htmlFile = false)
     {
         if (!empty ($data['json'])) $htmlFile = false;
