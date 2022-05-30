@@ -79,6 +79,7 @@ class Router
         $params = explode ('?', $url);
         $url = $params[0];
         $params = count ($params) > 1 ? explode ('&', $params[1]) : [];
+        $params = (object)[ "url" => $params, "body" => $this->getRequestBody()];
 
         $result = $this->processPath ($method, $url, $params);
         if ($result) return $result;
@@ -91,7 +92,7 @@ class Router
      */
     protected function addPath ($method, $path, $action)
     {
-        if (!empty ($this->_routerPaths[$method])) $this->_routerPaths[$method] = [];
+        if (empty ($this->_routerPaths[$method])) $this->_routerPaths[$method] = [];
 
         $this->_routerPaths[$method][$path] = $action;
     }
@@ -107,5 +108,15 @@ class Router
         $action = $this->_routerPaths[$method][$url];
 
         return  $this->_parent->{$action} ($params);
+    }
+
+    protected function getRequestBody ()
+    {
+        $data = file_get_contents ('php://input');
+        if (empty ($data)) return false;
+        
+        $data = json_decode ($data, true);
+
+        return (object) $data;
     }
 }
