@@ -84,7 +84,7 @@ class Authorization
             if (!empty ($result)) {
                 $this->_user = $result;
                 $this->_isLogined = true;
-                $this->_qb->Query ("UPDATE sessions set activity=now() where id='{$this->_sessionID}'");
+                $this->_db->Query ("UPDATE sessions set activity=now() where id='{$this->_sessionID}'");
             }
         }
     }
