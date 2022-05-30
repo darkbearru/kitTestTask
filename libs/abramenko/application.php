@@ -134,66 +134,6 @@ class Application
         return $this->_templateFileName;
     }
 
-    public function pageAPI2 ()
-    {
-        $template = new Template ();
-        $this->_auth = new Authorization ();
-        
-        if (!empty($_GET['request']) && $this->_auth->isLogined ()) {
-            $method = $_GET['request'];
-            $db = new DB ();
-            $id = intval ($_GET['id']);
-            $upid = intval ($_GET['upid']);
-
-            $name = addslashes ($_GET['name']);
-            $text = $_GET['text'];
-
-            $text = str_replace('\n', "\n", $text);
-
-            $text = addslashes ($text);
-
-            $results = false;
-
-            switch ($method) {
-                case "POST" : {
-                    $results = $db->Query ("insert into posts (upid, name, text, changed) values('{$upid}', '{$name}', '{$text}', now())");
-                    if (!$db->isError ()){
-                        $results = [
-                            "result" => "ok",
-                            "id"    => $db->insertID (),
-                            "upid"  => (!empty($upid) ? $upid : 0)
-                        ];
-                    }
-                    break;
-                }
-                case "DELETE" : {
-                    $results = $db->Query ("delete from posts where upid='{$id}'");
-                    if (!$db->isError ()) {
-                        $results = $db->Query ("delete from posts where id='{$id}'");
-                    }
-                    break;
-                }
-                case "PUT" : {
-                    $results = $db->Query ("update posts set upid='{$upid}', name='{$name}', text='{$text}', changed=now() where id='{$id}'");
-                    break;
-                }
-            }
-            if (!$results && $db->isError ()) {
-                $results = ["error" => $db->errorsList ()];
-            } else {
-                if (!$results) {
-                    $results = [ "result" => "ok" ];
-                }
-            }
-            $template->show ($results);
-
-        } else {
-            $results = $this->getTree ();
-            $template->show ($results);
-        }
-        
-    }
-
     protected function JsonAnswer ($data)
     {
         $data = (array) $data;
