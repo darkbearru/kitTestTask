@@ -1,4 +1,4 @@
-import {treeForm} from './tree-form.js';
+import {treeForm} from './tree-form.js?3';
 
 export class myTree
 {
@@ -62,7 +62,7 @@ export class myTree
     }
 
     /**
-     * Получаем данные у атрибутов data-id, data-upid, data-name, data-text у вложенного span
+     * Получаем данные у атрибутов data-id, data-upid, data-name, data-description у вложенного span
      * @param {HTMLElement} item 
      */
     getTreeItemData (item)
@@ -73,7 +73,7 @@ export class myTree
             id : span.getAttribute ('data-id'),
             upid : span.getAttribute ('data-upid'),
             name : span.getAttribute ('data-name'),
-            text: span.getAttribute ('data-text'),
+            description: span.getAttribute ('data-description'),
             childs : []
         }
     }
@@ -185,6 +185,7 @@ export class myTree
      */
     loadTreeFinished (data)
     {
+        data = typeof data['data-list'] !== 'undefined' ? data['data-list'] : [];
         let buffer = this.createHTMLTree (data);
         this.idTree.innerHTML = '';
         this.idTree.appendChild(buffer);
@@ -208,16 +209,20 @@ export class myTree
         return frag;
     }
 
-    createTreeItem (item)
-    {
-        item = item || {
+    /**
+     * Добавление элемента дерева в DOM
+     * @param {Object} item 
+     * @returns 
+     */
+    createTreeItem (item = {
             id: "",
             upid: "",
             name: "<<< Новый элемент >>>",
-            text: "<<< Описание нового элемента >>>"
-        };
+            description: "<<< Описание нового элемента >>>"
+        })
+    {
         let li = document.createElement ('li');
-        li._data = {id: item.id, upid: item.upid, name: item.name, text: item.text, childs: (item.childs ? true : false)};
+        li._data = {id: item.id, upid: item.upid, name: item.name, description: item.description, childs: (item.childs ? true : false)};
         li.innerHTML = `<span data-id="${item.id}"><i></i><a href="">${item.name}</a></span>`;
         if (item.childs) {
             let ul = document.createElement ('ul');

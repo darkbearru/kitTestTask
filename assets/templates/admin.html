@@ -5,21 +5,20 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
-    <link rel="stylesheet" href="/assets/main.css?0" type="text/css" />
+    <link rel="stylesheet" href="/assets/main.css" type="text/css" />
     <base href="/">
     {{login-form}}
         <script type="text/javascript" src="./assets/login-form.js" async></script>
     {{/login-form}}
     {{is-logined}}
-        <script type="module" src="./assets/admin.js?1" async></script>
+        <script type="module" src="./assets/admin.js?5" async></script>
     {{/is-logined}}
 </head>
 <body class="is-admin">
     <header>
         <h1>{{caption}}</h1>
         {{is-logined}}
-            <form method="post">
-                <input type="hidden" name="logout" value="1" />
+            <form method="post" action="/admin/logout/">
                 <input type="submit" value="Выйти" />
             </form>
         {{/is-logined}}
@@ -29,13 +28,6 @@
             <aside>
                 <ul class="my-tree" id="my-tree">
                     {{data-list}}
-                        <li>
-                            <span data-id="{{id}}" data-upid="{{upid}}" data-name="{{name}}" data-text="{{text}}">
-                                <i></i><a href="">{{name}}</a>
-                            </span>
-                            {{childs}}
-                        </li>
-                    {{/data-list}}
                 </ul>
                 <div class="tree-buttons">
                     <button class="tree-buttons__add">Добавить</button>
@@ -68,7 +60,7 @@
     {{login-form}}
         <div class="login-form__wrapper">
             <div class="login-form">
-                <form method="post">
+                <form method="post" action="/admin/login/">
                     <div>
                         <input type="text" name="login" value="" placeholder="Логин" />
                     </div>

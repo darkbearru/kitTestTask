@@ -27,6 +27,6 @@ export class treeForm {
     {
         this._itemData = data;
         this.formHeader.innerText = (data ? data.name : '');
-        this.formDescription.innerHTML = (data ? data.text.replace(/\n/gi, "<br />\n") : '');
+        this.formDescription.innerHTML = (data ? data.description.replace(/\n/gi, "<br />\n") : '');
     }
 }

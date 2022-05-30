@@ -1,5 +1,5 @@
-import {treeForm} from './tree-form.js';
-import { makeQueryParams } from './my-fetch.js?1';
+import { treeForm } from './tree-form.js';
+import { myFetch } from './my-fetch.js?1';
 
 export class treeAdminForm extends treeForm {
 
@@ -17,13 +17,13 @@ export class treeAdminForm extends treeForm {
         this.form = this.idForm.querySelector ('form');
 
         this.formHeader = this.form.querySelector ('input[name=name]');
-        this.formText = this.form.querySelector ('textarea');
+        this.formDescription = this.form.querySelector ('textarea');
         this.formParent = this.form.querySelector ('select');
         this.btnSave = this.form.querySelector ('.btn-submit');
         this.btnCancel = this.form.querySelector ('.btn-cancel');
 
         this.formHeader.addEventListener ('keyup', (e) => this.changeStatus (e));
-        this.formText.addEventListener ('keyup', (e) => this.changeStatus (e));
+        this.formDescription.addEventListener ('keyup', (e) => this.changeStatus (e));
         this.formParent.addEventListener ('change', (e) => this.changeStatus (e));
         this.btnCancel.addEventListener ('click', e => {return this.onCancel(e)});
         this.btnSave.addEventListener ('click', e => {return this.onSave(e)});
@@ -36,7 +36,7 @@ export class treeAdminForm extends treeForm {
     {
         this._itemData = data;
         this.formHeader.value = (data ? data.name : '');
-        this.formText.value = (data ? data.text : '');
+        this.formDescription.value = (data ? data.description : '');
         if (!data) {
             this.formParent.innerHTML = '';
         }
@@ -47,7 +47,7 @@ export class treeAdminForm extends treeForm {
     {
         let changed = false;
         let name = this.formHeader.value.trim ();
-        let text = this.formText.value; 
+        let description = this.formDescription.value; 
         let upid = this.formParent.value;
         let isNew = false;
 
@@ -56,14 +56,14 @@ export class treeAdminForm extends treeForm {
             if (
                 isNew || 
                 name !== this._itemData.name  || 
-                text !== this._itemData.text ||
+                description !== this._itemData.description ||
                 upid != this._itemData.upid
             ) {
                 changed = true;
             }
         }
 
-        if ((name.length === text.length) && (name.length === 0)) {
+        if ((name.length === description.length) && (name.length === 0)) {
             this.btnSave.setAttribute ("disabled", "");
             this.btnCancel.setAttribute ("disabled", "");
         } else if (changed) {
@@ -85,22 +85,23 @@ export class treeAdminForm extends treeForm {
     onSave (e)
     {
         e.preventDefault ();
-        let data = this._itemData;
+        const data = this._itemData;
+        const upid = this.formParent.value;
         let name = this.formHeader.value.trim ();
-        let text = this.formText.value;
-        let upid = this.formParent.value;
+        let description = this.formDescription.value;
                 
         data.upid = upid;
         data.name = name;
-        data.text = text.replace(/\n/gi, "\\n");
+        data.description = description.replace(/\n/gi, "\\n");
+
+        const {childs, ...fetchData} = data;
        
-        data.request = data.isNew ? 'POST' : 'PUT';
-        fetch ('/api/' + makeQueryParams (data))
+        myFetch ('/api/', (data.isNew ? 'POST' : 'PUT'), fetchData)
             .then (response => response.json ())
             .then (json => {
                 if (json.result == 'ok') {
                     if (this.parent) {
-                        data.text = text;
+                        data.description = description;
                         data.id = (typeof json.id !== 'undefined' ? json.id : data.id);
                         data.upid = (typeof json.upid !== 'undefined' ? json.upid : data.upid);
                         this.parent.changeItemData (data);
@@ -117,14 +118,14 @@ export class treeAdminForm extends treeForm {
     disableFormFields ()
     {
         this.formHeader.setAttribute ("disabled", "");
-        this.formText.setAttribute ("disabled", "");
+        this.formDescription.setAttribute ("disabled", "");
         this.formParent.setAttribute ("disabled", "");
     }
 
     enableFormFields ()
     {
         this.formHeader.removeAttribute ("disabled");
-        this.formText.removeAttribute ("disabled");
+        this.formDescription.removeAttribute ("disabled");
         this.formParent.removeAttribute ("disabled");
     }
 
