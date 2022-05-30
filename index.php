@@ -14,4 +14,4 @@ $template = new Template ();
 
 $data = $application->run (); 
 
-$template->show ($data, "index.html");
+$template->show ($data, $application->templateFileName ());
